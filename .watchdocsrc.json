@@ -1,0 +1,25 @@
+{
+  "$schema": "https://watchdocs.dev/schema.json",
+  "version": 1,
+  "watch": {
+    "routes": [
+      "src/routes/**/*.{ts,js,py,go}",
+      "src/controllers/**/*.{ts,js,py,go}",
+      "openapi.{json,yaml,yml}"
+    ],
+    "ignore": ["**/*.test.*", "**/*.spec.*", "**/internal/**"]
+  },
+  "docs": {
+    "files": [
+      "docs/quickstart.md",
+      "docs/errors.md",
+      "docs/api-reference.md",
+      "public/llms.txt"
+    ]
+  },
+  "pr": {
+    "branchPrefix": "watchdocs/update-",
+    "labels": ["documentation", "automated-pr"],
+    "reviewers": []
+  }
+}

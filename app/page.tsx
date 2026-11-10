@@ -52,17 +52,11 @@ export default function Home() {
 
       <main className="flex-1">
         {/* 2. HERO */}
-        <section className="pt-20 pb-16 px-4 border-b border-gh-border/60">
+        <section className="pt-12 pb-16 px-4 border-b border-gh-border/60">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Tag / Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-zinc-900 border border-zinc-700 text-zinc-300 mb-6">
-              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              CLI + GitHub Action for Fast-Moving APIs
-            </div>
-
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-6 leading-[1.1]">
               Your docs update themselves. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-500">
+              <span className="text-emerald-400">
                 You just review the PR.
               </span>
             </h1>
@@ -159,7 +153,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-gh-surface border border-gh-border p-6 rounded-xl">
-              <div className="w-10 h-10 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center font-mono text-sm mb-4">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-mono text-sm mb-4">
                 01
               </div>
               <h3 className="text-base font-bold text-white mb-2">
@@ -187,7 +181,7 @@ export default function Home() {
             </div>
 
             <div className="bg-gh-surface border border-gh-border p-6 rounded-xl">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center font-mono text-sm mb-4">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-mono text-sm mb-4">
                 03
               </div>
               <h3 className="text-base font-bold text-white mb-2">
