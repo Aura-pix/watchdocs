@@ -1,0 +1,22 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #090d16;
+  color: #f0f6fc;
+}
+
+/* Custom scrollbar for diff viewers */
+pre::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+pre::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 3px;
+}
