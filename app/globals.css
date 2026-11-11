@@ -2,21 +2,21 @@
 @config "../tailwind.config.js";
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: #090d16;
-  color: #f0f6fc;
+  background-color: #f7f5f0;
+  color: #161614;
 }
 
-/* Custom scrollbar for diff viewers */
 pre::-webkit-scrollbar {
   height: 6px;
   width: 6px;
 }
+
 pre::-webkit-scrollbar-thumb {
-  background: #30363d;
+  background: #e4e1d8;
   border-radius: 3px;
 }

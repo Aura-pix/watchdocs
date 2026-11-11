@@ -1,35 +1,36 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-sans" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "Watchdocs — Your docs update themselves. You just review the PR.",
+  metadataBase: new URL("https://watchdocs.dev"),
+  title: "Watchdocs — Pull requests that keep your docs current",
   description:
-    "GitHub Action + CLI that watches your API commits, updates your documentation (quickstart, errors, llms.txt), and opens a pull request. Never auto-merges.",
+    "Watchdocs opens a pull request when your API changes and your docs are out of date. Install the GitHub App, pick a repo, review the PR. Nothing merges on its own.",
   keywords: [
     "developer tools",
     "API documentation",
-    "GitHub Action",
+    "GitHub App",
     "llms.txt",
     "OpenAPI automation",
-    "DeFi API",
-    "AI agent docs",
+    "API docs sync",
   ],
   openGraph: {
-    title: "Watchdocs — Automated Docs PRs for Fast-Moving APIs",
-    description: "Your docs update themselves. You just review the PR.",
+    title: "Watchdocs — Pull requests that keep your docs current",
+    description:
+      "Watchdocs opens a pull request when your API changes and your docs are out of date.",
     url: "https://watchdocs.dev",
     siteName: "Watchdocs",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Watchdocs — Automated Docs PRs",
+    title: "Watchdocs — Pull requests that keep your docs current",
     description:
-      "Detects API code changes, edits markdown guides, and submits a PR.",
+      "Detects API code changes, edits markdown guides, and opens a pull request for review.",
   },
   robots: {
     index: true,
@@ -44,7 +45,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
-      <body className="bg-gh-bg text-slate-100 antialiased selection:bg-gh-green/30 selection:text-white">
+      <body className="bg-paper text-ink antialiased selection:bg-success-soft selection:text-ink">
         {children}
       </body>
     </html>

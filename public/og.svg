@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <mask id="cuts">
+      <rect width="128" height="128" fill="#fff"/>
+      <g stroke="#000" stroke-width="5">
+        <line x1="26" y1="126" x2="58" y2="84"/>
+        <line x1="44" y1="126" x2="74" y2="88"/>
+      </g>
+      <polygon points="80,46 92,48 82,52" fill="#000"/>
+    </mask>
+  </defs>
+  <rect width="1200" height="630" fill="#F7F5F0"/>
+  <g transform="translate(80 64) scale(0.5)">
+    <polygon mask="url(#cuts)" fill="#161614" points="40,12 54,34 64,8 74,38 110,56 112,64 100,70 80,76 84,92 88,122 30,122 22,100 30,70 36,44"/>
+  </g>
+  <text x="156" y="116" font-family="Instrument Sans, Helvetica, Arial, sans-serif" font-size="40" font-weight="600" fill="#161614">Watchdocs</text>
+  <text x="80" y="300" font-family="Instrument Sans, Helvetica, Arial, sans-serif" font-size="68" font-weight="600" fill="#161614">Docs PRs when</text>
+  <text x="80" y="380" font-family="Instrument Sans, Helvetica, Arial, sans-serif" font-size="68" font-weight="600" fill="#161614">your API changes.</text>
+  <text x="80" y="446" font-family="Instrument Sans, Helvetica, Arial, sans-serif" font-size="30" fill="#6B6A63">A GitHub App. You review the PR,</text>
+  <text x="80" y="486" font-family="Instrument Sans, Helvetica, Arial, sans-serif" font-size="30" fill="#6B6A63">nothing merges on its own.</text>
+  <g font-family="JetBrains Mono, Menlo, Consolas, monospace" font-size="24">
+    <rect x="770" y="80" width="350" height="64" rx="10" fill="#FFFFFF" stroke="#E4E1D8" stroke-width="2"/>
+    <text x="798" y="121" fill="#161614">git push main</text>
+    <line x1="945" y1="144" x2="945" y2="196" stroke="#6B6A63" stroke-width="2"/>
+    <rect x="770" y="196" width="350" height="64" rx="10" fill="#FFFFFF" stroke="#E4E1D8" stroke-width="2"/>
+    <text x="798" y="237" fill="#161614">watchdocs[bot]</text>
+    <line x1="945" y1="260" x2="945" y2="312" stroke="#6B6A63" stroke-width="2"/>
+    <rect x="770" y="312" width="350" height="200" rx="10" fill="#FFFFFF" stroke="#E4E1D8" stroke-width="2"/>
+    <text x="798" y="354" fill="#161614" font-size="22">#142 docs: update /swap</text>
+    <rect x="771" y="384" width="348" height="40" fill="#FBE9E7"/>
+    <text x="798" y="412" fill="#B3261E" font-size="22">- "slippage": 1</text>
+    <rect x="771" y="432" width="348" height="40" fill="#E6F4EA"/>
+    <text x="798" y="460" fill="#1F7A3D" font-size="22">+ "slippageBps": 50</text>
+  </g>
+</svg>

@@ -7,20 +7,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        gh: {
-          bg: "#090d16",
-          canvas: "#0d1117",
-          surface: "#161b22",
-          border: "#30363d",
-          muted: "#8b949e",
-          text: "#c9d1d9",
-          green: "#238636",
-          greenHover: "#2ea043",
-          greenBadge: "#22c55e",
-          diffAdd: "#04260f",
-          diffAddText: "#7ee787",
-          diffDel: "#490202",
-          diffDelText: "#ff7b72",
+        paper: "#F7F5F0",
+        surface: "#FFFFFF",
+        ink: "#161614",
+        muted: "#6B6A63",
+        line: "#E4E1D8",
+        code: "#F2EFE8",
+        success: {
+          DEFAULT: "#1F7A3D",
+          soft: "#E6F4EA",
+        },
+        danger: {
+          DEFAULT: "#B42318",
+          soft: "#FEECEB",
         },
       },
       fontFamily: {

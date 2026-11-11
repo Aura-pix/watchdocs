@@ -6,10 +6,11 @@ export default function WaitlistForm() {
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
   const [repoUrl, setRepoUrl] = useState("");
-  const [apiType, setApiType] = useState("DeFi / Web3");
+  const [apiType, setApiType] = useState("SaaS API");
   const [painPoint, setPainPoint] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [duplicate, setDuplicate] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleStepOne = (e: React.FormEvent) => {
@@ -34,22 +35,23 @@ export default function WaitlistForm() {
         body: JSON.stringify({ email, repoUrl, apiType, painPoint }),
       });
 
-      if (!res.ok) throw new Error("Submission failed");
+      const body = (await res.json()) as {
+        duplicate?: boolean;
+        error?: string;
+      };
+
+      if (!res.ok) {
+        throw new Error(body.error ?? "Submission failed");
+      }
+
+      setDuplicate(Boolean(body.duplicate));
       setSubmitted(true);
-    } catch {
-      // Fallback: save to localStorage if backend fetch fails
-      const fallbackList = JSON.parse(
-        localStorage.getItem("watchdocs_waitlist") || "[]",
+    } catch (error) {
+      setErrorMsg(
+        error instanceof Error
+          ? error.message
+          : "Could not save your spot. Please try again.",
       );
-      fallbackList.push({
-        email,
-        repoUrl,
-        apiType,
-        painPoint,
-        date: new Date().toISOString(),
-      });
-      localStorage.setItem("watchdocs_waitlist", JSON.stringify(fallbackList));
-      setSubmitted(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -57,33 +59,30 @@ export default function WaitlistForm() {
 
   if (submitted) {
     return (
-      <div className="border border-emerald-500/40 bg-emerald-950/20 rounded-xl p-8 text-center max-w-lg mx-auto">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 mb-4 font-mono font-bold text-lg">
-          ✓
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2">You&apos;re in.</h3>
-        <p className="text-zinc-300 text-sm mb-4">
-          We&apos;re onboarding our first 10 API teams. We&apos;ll reach out to{" "}
-          <span className="text-white font-medium underline">{email}</span> as
-          soon as your spot opens.
+      <div className="mx-auto max-w-lg rounded-xl border border-success/30 bg-success-soft p-8 text-center">
+        <h3 className="text-xl font-semibold text-ink">
+          {duplicate ? "You are already on the list." : "You are in."}
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          We are onboarding a small group of API teams. We will reach out to{" "}
+          <span className="font-medium text-ink">{email}</span> when your spot
+          opens.
         </p>
-        <span className="inline-block text-xs font-mono text-emerald-400/80 bg-emerald-900/30 px-3 py-1 rounded-full border border-emerald-500/30">
-          Status: Waitlist Priority #14
-        </span>
       </div>
     );
   }
 
+  const inputClass =
+    "w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder-muted focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink";
+  const labelClass = "mb-1.5 block font-mono text-xs text-muted";
+
   return (
-    <div className="max-w-xl mx-auto bg-gh-surface border border-gh-border p-6 md:p-8 rounded-xl shadow-2xl">
+    <div className="mx-auto max-w-xl rounded-xl border border-line bg-surface p-6 shadow-sm md:p-8">
       {step === 1 ? (
         <form onSubmit={handleStepOne} className="space-y-4">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-xs font-mono text-zinc-400 uppercase tracking-wider mb-2"
-            >
-              Work Email
+            <label htmlFor="email" className={labelClass}>
+              Work email
             </label>
             <input
               id="email"
@@ -92,46 +91,41 @@ export default function WaitlistForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="alex@company.com"
-              className="w-full bg-[#0d1117] border border-gh-border rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono text-sm"
+              className={inputClass}
             />
           </div>
 
           {errorMsg && (
-            <p className="text-rose-400 text-xs font-mono">{errorMsg}</p>
+            <p className="font-mono text-xs text-danger">{errorMsg}</p>
           )}
 
           <button
             type="submit"
-            className="w-full bg-gh-green hover:bg-gh-greenHover text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-ink px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
           >
-            Join Waitlist
-            <span className="font-mono text-xs">→</span>
+            Join the waitlist
+            <span aria-hidden="true">&rarr;</span>
           </button>
-          <p className="text-[11px] text-zinc-400 text-center font-mono">
-            Step 1 of 2: Reserve your spot with your email.
+          <p className="text-center font-mono text-[11px] text-muted">
+            Step 1 of 2
           </p>
         </form>
       ) : (
         <form onSubmit={handleFinalSubmit} className="space-y-4">
-          <div className="bg-[#090d16] p-3 rounded-lg border border-gh-border flex items-center justify-between text-xs font-mono">
-            <span className="text-zinc-400 truncate max-w-[240px]">
-              {email}
-            </span>
+          <div className="flex items-center justify-between rounded-lg border border-line bg-paper p-3 font-mono text-xs">
+            <span className="max-w-[240px] truncate text-muted">{email}</span>
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="text-emerald-400 hover:underline text-[11px]"
+              className="text-[11px] text-ink underline"
             >
               Change
             </button>
           </div>
 
           <div>
-            <label
-              htmlFor="repo"
-              className="block text-xs font-mono text-zinc-400 mb-1"
-            >
-              GitHub Repo URL <span className="text-zinc-400">(Optional)</span>
+            <label htmlFor="repo" className={labelClass}>
+              GitHub repository (optional)
             </label>
             <input
               id="repo"
@@ -139,53 +133,51 @@ export default function WaitlistForm() {
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
               placeholder="github.com/org/api-service"
-              className="w-full bg-[#0d1117] border border-gh-border rounded-lg px-3.5 py-2.5 text-white placeholder-zinc-500 text-sm font-mono focus:outline-none focus:border-emerald-500"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label
-              htmlFor="apiType"
-              className="block text-xs font-mono text-zinc-400 mb-1"
-            >
-              What API do you ship?
+            <label htmlFor="apiType" className={labelClass}>
+              What do you ship?
             </label>
             <select
               id="apiType"
               value={apiType}
               onChange={(e) => setApiType(e.target.value)}
-              className="w-full bg-[#0d1117] border border-gh-border rounded-lg px-3.5 py-2.5 text-white text-sm focus:outline-none focus:border-emerald-500"
+              className={inputClass}
             >
-              <option value="DeFi / Web3">DeFi / Web3 Protocol</option>
-              <option value="AI Agent API">AI Agent / LLM API</option>
-              <option value="SaaS API">B2B SaaS / Developer API</option>
+              <option value="SaaS API">B2B SaaS / developer API</option>
+              <option value="AI Agent API">AI agent / LLM API</option>
+              <option value="DeFi / Web3">DeFi / Web3 protocol</option>
               <option value="Other">Other</option>
             </select>
           </div>
 
           <div>
-            <label
-              htmlFor="pain"
-              className="block text-xs font-mono text-zinc-400 mb-1"
-            >
-              Biggest docs pain right now?
+            <label htmlFor="pain" className={labelClass}>
+              Where do your docs fall behind?
             </label>
             <textarea
               id="pain"
               rows={2}
               value={painPoint}
               onChange={(e) => setPainPoint(e.target.value)}
-              placeholder="e.g. Failure codes never get documented, engineers change endpoints and forget quickstart..."
-              className="w-full bg-[#0d1117] border border-gh-border rounded-lg px-3.5 py-2 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-emerald-500"
+              placeholder="Rate limits rarely get documented, and quickstarts go stale after endpoint changes."
+              className={inputClass}
             />
           </div>
+
+          {errorMsg && (
+            <p className="font-mono text-xs text-danger">{errorMsg}</p>
+          )}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gh-green hover:bg-gh-greenHover disabled:opacity-50 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-ink px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-ink/85 disabled:opacity-50"
           >
-            {isSubmitting ? "Saving..." : "Complete Waitlist Registration"}
+            {isSubmitting ? "Saving..." : "Complete registration"}
           </button>
         </form>
       )}

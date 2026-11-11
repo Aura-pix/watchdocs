@@ -4,100 +4,90 @@ import { useState } from "react";
 
 type DocFile = "quickstart.md" | "errors.md" | "llms.txt";
 
+const files: DocFile[] = ["quickstart.md", "errors.md", "llms.txt"];
+
 export default function InteractiveDiff() {
   const [activeTab, setActiveTab] = useState<DocFile>("quickstart.md");
 
   return (
-    <div className="border border-gh-border rounded-xl bg-gh-canvas overflow-hidden shadow-2xl">
-      {/* Top Banner: Git Commit Trigger */}
-      <div className="bg-gh-surface border-b border-gh-border px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700">
+    <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-paper px-4 py-3 text-xs">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded border border-line bg-surface px-2 py-0.5 font-mono text-muted">
             commit 4a8f9c1
           </span>
-          <span className="text-zinc-200 font-medium">
-            feat(api): add slippageBps parameter and rate limiting to /swap
+          <span className="font-medium text-ink">
+            feat(api): add slippageBps and rate limiting to /swap
           </span>
         </div>
-        <span className="text-gh-muted font-mono">
-          Triggered by git push to main
-        </span>
+        <span className="font-mono text-muted">git push to main</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-gh-border">
-        {/* Left column: The code change that caused it */}
-        <div className="lg:col-span-5 p-4 bg-[#070a10]">
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-gh-border">
-            <span className="text-xs font-mono font-semibold text-zinc-400">
-              API ROUTE: src/routes/swap.ts
+      <div className="grid divide-y divide-line lg:grid-cols-12 lg:divide-x lg:divide-y-0">
+        <div className="bg-code p-4 lg:col-span-5">
+          <div className="mb-3 flex items-center justify-between border-b border-line pb-3">
+            <span className="font-mono text-xs font-semibold text-muted">
+              src/routes/swap.ts
             </span>
-            <span className="text-[11px] font-mono text-zinc-400">
-              Source Diff
-            </span>
+            <span className="font-mono text-[11px] text-muted">source diff</span>
           </div>
 
-          <pre className="font-mono text-xs leading-relaxed overflow-x-auto text-zinc-300">
-            <div className="text-zinc-400 select-none">
-              @@ -14,6 +14,8 @@ export async function handleSwap()
+          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-ink">
+            <div className="select-none text-muted">
+              @@ -14,6 +14,8 @@ handleSwap()
             </div>
             <div>&nbsp;&nbsp;const schema = z.object({"{"}</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;tokenIn: z.string(),</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;tokenOut: z.string(),</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;amount: z.string(),</div>
-            <div className="bg-gh-diffAdd text-gh-diffAddText px-1 rounded">
+            <div className="rounded bg-success-soft px-1 text-success">
               +&nbsp;&nbsp;&nbsp;slippageBps: z.number().max(500),
             </div>
             <div>&nbsp;&nbsp;{"}"});</div>
             <div>&nbsp;</div>
-            <div className="text-zinc-400 select-none">@@ -42,3 +44,6 @@</div>
-            <div className="bg-gh-diffAdd text-gh-diffAddText px-1 rounded">
+            <div className="select-none text-muted">@@ -42,3 +44,6 @@</div>
+            <div className="rounded bg-success-soft px-1 text-success">
               +&nbsp;if (rateLimitExceeded) {"{"}
             </div>
-            <div className="bg-gh-diffAdd text-gh-diffAddText px-1 rounded">
+            <div className="rounded bg-success-soft px-1 text-success">
               +&nbsp;&nbsp;&nbsp;throw new ApiError(429,
               &quot;RATE_LIMITED&quot;);
             </div>
-            <div className="bg-gh-diffAdd text-gh-diffAddText px-1 rounded">
+            <div className="rounded bg-success-soft px-1 text-success">
               +&nbsp;{"}"}
             </div>
           </pre>
         </div>
 
-        {/* Right column: The markdown docs updated automatically */}
-        <div className="lg:col-span-7 p-4 bg-gh-canvas">
-          <div className="flex flex-wrap items-center justify-between pb-3 mb-3 border-b border-gh-border gap-2">
-            <span className="text-xs font-mono text-emerald-400 font-semibold flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 inline-block"></span>
-              Watchdocs Edited 3 Files:
+        <div className="p-4 lg:col-span-7">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-line pb-3">
+            <span className="font-mono text-xs font-semibold text-success">
+              Watchdocs updated 3 files
             </span>
 
-            {/* Doc File Tabs */}
             <div className="flex items-center gap-1">
-              {(["quickstart.md", "errors.md", "llms.txt"] as DocFile[]).map(
-                (tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-2.5 py-1 text-xs font-mono rounded transition-colors ${
-                      activeTab === tab
-                        ? "bg-zinc-800 text-white font-medium border border-zinc-700"
-                        : "text-zinc-400 hover:text-zinc-200"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ),
-              )}
+              {files.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`rounded px-2.5 py-1 font-mono text-xs transition-colors ${
+                    activeTab === tab
+                      ? "bg-ink font-medium text-paper"
+                      : "text-muted hover:text-ink"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Tab 1: quickstart.md */}
           {activeTab === "quickstart.md" && (
-            <pre className="font-mono text-xs leading-relaxed overflow-x-auto text-zinc-300">
-              <div className="text-zinc-400 select-none">
-                # quickstart.md: Example Request Body
+            <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-ink">
+              <div className="select-none text-muted">
+                # quickstart.md: example request
               </div>
-              <div className="text-gh-muted">&nbsp;&nbsp;POST /api/v1/swap</div>
+              <div className="text-muted">&nbsp;&nbsp;POST /api/v1/swap</div>
               <div>&nbsp;&nbsp;{"{"}</div>
               <div>
                 &nbsp;&nbsp;&nbsp;&nbsp;&quot;tokenIn&quot;:
@@ -110,7 +100,7 @@ export default function InteractiveDiff() {
               <div>
                 &nbsp;&nbsp;&nbsp;&nbsp;&quot;amount&quot;: &quot;1000000&quot;,
               </div>
-              <div className="bg-gh-diffAdd text-gh-diffAddText px-1 rounded">
+              <div className="rounded bg-success-soft px-1 text-success">
                 +&nbsp;&nbsp;&nbsp;&quot;slippageBps&quot;: 50 // optional: max
                 500 (0.5%)
               </div>
@@ -118,11 +108,10 @@ export default function InteractiveDiff() {
             </pre>
           )}
 
-          {/* Tab 2: errors.md */}
           {activeTab === "errors.md" && (
-            <pre className="font-mono text-xs leading-relaxed overflow-x-auto text-zinc-300">
-              <div className="text-zinc-400 select-none">
-                # errors.md: Common Status Codes
+            <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-ink">
+              <div className="select-none text-muted">
+                # errors.md: common status codes
               </div>
               <div>&nbsp;&nbsp;| Code | Name | Description |</div>
               <div>
@@ -130,38 +119,36 @@ export default function InteractiveDiff() {
                 |
               </div>
               <div>
-                &nbsp;&nbsp;| 401 | UNAUTHORIZED | Invalid or expired API Key |
+                &nbsp;&nbsp;| 401 | UNAUTHORIZED | Invalid or expired API key |
               </div>
-              <div className="bg-gh-diffAdd text-gh-diffAddText px-1 rounded">
+              <div className="rounded bg-success-soft px-1 text-success">
                 +&nbsp;| 429 | RATE_LIMITED | Limit is 60 req/min. Includes
                 Retry-After |
               </div>
             </pre>
           )}
 
-          {/* Tab 3: llms.txt */}
           {activeTab === "llms.txt" && (
-            <pre className="font-mono text-xs leading-relaxed overflow-x-auto text-zinc-300">
-              <div className="text-zinc-400 select-none">
-                # llms.txt: Condensed System Prompt for LLM Agents
+            <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-ink">
+              <div className="select-none text-muted">
+                # llms.txt: condensed API facts
               </div>
               <div>&nbsp;&nbsp;## POST /swap</div>
               <div>
-                &nbsp;&nbsp;- tokenIn (string, required): Input ERC20 address
+                &nbsp;&nbsp;- tokenIn (string, required): input token address
               </div>
               <div>
-                &nbsp;&nbsp;- tokenOut (string, required): Output ERC20 address
+                &nbsp;&nbsp;- tokenOut (string, required): output token address
               </div>
               <div>
-                &nbsp;&nbsp;- amount (string, required): Raw atomic units
+                &nbsp;&nbsp;- amount (string, required): raw atomic units
               </div>
-              <div className="bg-gh-diffAdd text-gh-diffAddText px-1 rounded">
-                +&nbsp;- slippageBps (integer, optional): Max allowed slippage
+              <div className="rounded bg-success-soft px-1 text-success">
+                +&nbsp;- slippageBps (integer, optional): max allowed slippage
                 in BPS.
               </div>
-              <div className="bg-gh-diffAdd text-gh-diffAddText px-1 rounded">
-                +&nbsp;- Error Handling: Catch 429 and respect Retry-After
-                header.
+              <div className="rounded bg-success-soft px-1 text-success">
+                +&nbsp;- Errors: catch 429 and respect Retry-After.
               </div>
             </pre>
           )}
