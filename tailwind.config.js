@@ -7,19 +7,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        paper: "#F7F5F0",
-        surface: "#FFFFFF",
-        ink: "#161614",
-        muted: "#6B6A63",
-        line: "#E4E1D8",
-        code: "#F2EFE8",
+        paper: "var(--paper)",
+        surface: "var(--surface)",
+        ink: "var(--ink)",
+        muted: "var(--muted)",
+        line: "var(--line)",
+        code: "var(--code)",
         success: {
-          DEFAULT: "#1F7A3D",
-          soft: "#E6F4EA",
+          DEFAULT: "var(--success)",
+          soft: "var(--success-soft)",
         },
         danger: {
-          DEFAULT: "#B42318",
-          soft: "#FEECEB",
+          DEFAULT: "var(--danger)",
+          soft: "var(--danger-soft)",
         },
       },
       fontFamily: {

@@ -1,0 +1,29 @@
+---
+title: Overview
+description: What Watchdocs does and when to use it.
+order: 1
+---
+
+Watchdocs is a GitHub App that opens a pull request when your API changes and your documentation is out of date. It reads the code diff, finds the pages that describe the changed endpoint, edits only the affected sections, and asks a human to review.
+
+Nothing merges on its own. Every documentation update lands as a branch and a pull request.
+
+## What it does
+
+1. A push to your default branch fires a webhook.
+2. Watchdocs filters the changed files to API code you have chosen to watch.
+3. The semantic gate checks whether the route path, HTTP method, request schema, or error statuses actually changed. Internal refactors stop here at zero cost.
+4. When the contract changed, Watchdocs ranks the documentation pages that mention the endpoint and always includes `llms.txt` and OpenAPI files.
+5. The engine harvests real request and response payloads from your tests, then asks the model for surgical edits.
+6. Edits are validated, committed, and pushed to a `watchdocs/sync-*` branch with a pull request.
+
+## When to use it
+
+- You ship an API and the docs live in the same repository.
+- Integrators read `llms.txt` or an OpenAPI file that drifts from the handlers.
+- Your support queue fills up with questions your error docs should answer.
+
+## When not to use it
+
+- Your documentation lives in a separate repository or a CMS. Watchdocs edits files inside the connected repository.
+- You want the bot to merge automatically. Watchdocs deliberately does not merge.

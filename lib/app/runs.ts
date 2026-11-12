@@ -8,6 +8,7 @@ const MAX_STORED_DIFF = 200_000;
 export interface CreateRunInput {
   repoId: string;
   commitSha: string;
+  webhookDeliveryId?: string | null;
 }
 
 export async function createRun(input: CreateRunInput): Promise<string> {
@@ -18,11 +19,38 @@ export async function createRun(input: CreateRunInput): Promise<string> {
       repoId: input.repoId,
       commitSha: input.commitSha,
       status: "running",
+      webhookDeliveryId: input.webhookDeliveryId ?? null,
     })
     .returning({ id: runs.id });
 
   if (!row) throw new Error("Could not create the run record.");
   return row.id;
+}
+
+export async function findRunByDelivery(
+  webhookDeliveryId: string,
+): Promise<typeof runs.$inferSelect | null> {
+  const db = getDb();
+  const [row] = await db
+    .select()
+    .from(runs)
+    .where(eq(runs.webhookDeliveryId, webhookDeliveryId))
+    .limit(1);
+
+  return row ?? null;
+}
+
+export async function resetRun(runId: string): Promise<void> {
+  const db = getDb();
+  await db
+    .update(runs)
+    .set({
+      status: "running",
+      error: null,
+      skipReason: null,
+      finishedAt: null,
+    })
+    .where(eq(runs.id, runId));
 }
 
 export interface RunDetails {
@@ -168,4 +196,28 @@ export async function recordUsage(input: {
         costUsd: sql`${usageMonthly.costUsd} + ${input.costUsd}`,
       },
     });
+}
+
+export async function recordUsageOnce(input: {
+  runId: string;
+  installationId: string;
+  prCount: number;
+  costUsd: number;
+  month?: string;
+}): Promise<void> {
+  const db = getDb();
+  const [claimed] = await db
+    .update(runs)
+    .set({ usageRecorded: true })
+    .where(and(eq(runs.id, input.runId), eq(runs.usageRecorded, false)))
+    .returning({ id: runs.id });
+
+  if (!claimed) return;
+
+  await recordUsage({
+    installationId: input.installationId,
+    prCount: input.prCount,
+    costUsd: input.costUsd,
+    month: input.month,
+  });
 }

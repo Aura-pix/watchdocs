@@ -1,0 +1,31 @@
+---
+title: Security
+description: How Watchdocs handles secrets, code, and permissions.
+order: 6
+---
+
+## Permissions
+
+The App requests Contents read/write, Pull requests read/write, and Metadata read. Nothing else. It never asks for admin access, secrets, or members access.
+
+## Code handling
+
+Documentation files and watched source files are read through the GitHub API during a run. Content is sent to the configured LLM only when the semantic gate decides the public contract changed, and only the diff, the ranked documentation pages, and test fixtures are included.
+
+Watchdocs does not store your source code. Run metadata, tokens, and cost are stored in Postgres so the dashboard can show history.
+
+## Webhooks
+
+Every webhook request is verified with an HMAC signature using the webhook secret. Delivery ids are stored to deduplicate retries.
+
+## Pull requests
+
+Edits are made by the App on a `watchdocs/sync-*` branch. The App never merges. Merging is always a human decision on your repository.
+
+## Secrets
+
+The GitHub App private key, OAuth secrets, and webhook secret live in environment variables. They are never exposed to the browser and never written into git.
+
+## Data deletion
+
+From **Settings**, you can delete your account and all associated data: installations, repositories, run history, and usage records. GitHub App installations themselves are not removed from your GitHub account.

@@ -23,6 +23,23 @@ export interface OpenPullRequestResult {
   reused: boolean;
 }
 
+async function listRepoLabels(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+): Promise<Set<string>> {
+  try {
+    const { data } = await octokit.rest.issues.listLabelsForRepo({
+      owner,
+      repo,
+      per_page: 100,
+    });
+    return new Set(data.map((label) => label.name));
+  } catch {
+    return new Set();
+  }
+}
+
 async function findBranchHead(
   octokit: Octokit,
   owner: string,
@@ -144,15 +161,20 @@ export async function commitAndOpenPullRequest(
   }
 
   if (input.labels.length > 0) {
-    try {
-      await octokit.rest.issues.addLabels({
-        owner,
-        repo,
-        issue_number: prNumber,
-        labels: input.labels,
-      });
-    } catch (error) {
-      console.warn("Could not add Watchdocs PR labels:", error);
+    const existing = await listRepoLabels(octokit, owner, repo);
+    const labels = input.labels.filter((label) => existing.has(label));
+
+    if (labels.length > 0) {
+      try {
+        await octokit.rest.issues.addLabels({
+          owner,
+          repo,
+          issue_number: prNumber,
+          labels,
+        });
+      } catch (error) {
+        console.warn("Could not add Watchdocs PR labels:", error);
+      }
     }
   }
 

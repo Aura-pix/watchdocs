@@ -1,6 +1,61 @@
+import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 import InstallButton from "@/components/InstallButton";
 import InteractiveDiff from "@/components/InteractiveDiff";
+import ThemeToggle from "@/components/ThemeToggle";
 import WaitlistForm from "@/components/WaitlistForm";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://watchdocs-five.vercel.app/#organization",
+      name: "Watchdocs",
+      url: "https://watchdocs-five.vercel.app",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://watchdocs-five.vercel.app/mark.svg",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://watchdocs-five.vercel.app/#website",
+      name: "Watchdocs",
+      url: "https://watchdocs-five.vercel.app",
+      publisher: { "@id": "https://watchdocs-five.vercel.app/#organization" },
+      inLanguage: "en",
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://watchdocs-five.vercel.app/#webpage",
+      url: "https://watchdocs-five.vercel.app",
+      name: "Watchdocs — Pull requests that keep your docs current",
+      isPartOf: { "@id": "https://watchdocs-five.vercel.app/#website" },
+      about: { "@id": "https://watchdocs-five.vercel.app/#software" },
+      inLanguage: "en",
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://watchdocs-five.vercel.app/#software",
+      name: "Watchdocs",
+      url: "https://watchdocs-five.vercel.app",
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Web",
+      description:
+        "Watchdocs opens a pull request when your API changes and your docs are out of date.",
+      image: "https://watchdocs-five.vercel.app/og.png",
+      publisher: { "@id": "https://watchdocs-five.vercel.app/#organization" },
+    },
+  ],
+};
 
 const steps = [
   {
@@ -87,12 +142,14 @@ const plans = [
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-paper font-sans text-ink">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <a href="#" className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-ink font-mono text-sm font-bold text-paper">
-              W
-            </span>
+            <Image src="/mark.svg" alt="" width={28} height={28} />
             <span className="text-base font-semibold tracking-tight">
               Watchdocs
             </span>
@@ -108,6 +165,9 @@ export default function Home() {
             <a href="#pricing" className="transition-colors hover:text-ink">
               Pricing
             </a>
+            <Link href="/docs" className="transition-colors hover:text-ink">
+              Docs
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -117,6 +177,7 @@ export default function Home() {
             >
               Join the waitlist
             </a>
+            <ThemeToggle />
             <InstallButton />
           </div>
         </div>
@@ -361,13 +422,30 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-line bg-surface px-4 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 text-xs text-muted sm:flex-row">
+        <div className="mx-auto flex max-w-6xl flex-col justify-between gap-6 text-xs text-muted sm:flex-row sm:items-center">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-ink">Watchdocs</span>
             <span>/</span>
             <span>Docs that keep up with your code.</span>
           </div>
-          <p>Built for teams that ship APIs.</p>
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <Link href="/docs" className="transition-colors hover:text-ink">
+              Docs
+            </Link>
+            <Link
+              href="/changelog"
+              className="transition-colors hover:text-ink"
+            >
+              Changelog
+            </Link>
+            <Link href="/privacy" className="transition-colors hover:text-ink">
+              Privacy
+            </Link>
+            <Link href="/terms" className="transition-colors hover:text-ink">
+              Terms
+            </Link>
+            <span>Built for teams that ship APIs.</span>
+          </nav>
         </div>
       </footer>
     </div>

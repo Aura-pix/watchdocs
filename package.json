@@ -18,15 +18,18 @@
     "engine:dry": "tsx scripts/watchdocs-engine.ts --dry-run"
   },
   "dependencies": {
+    "@mdx-js/mdx": "^3.1.1",
     "@neondatabase/serverless": "^1.2.0",
     "drizzle-orm": "^0.45.4",
     "inngest": "^4.26.2",
     "next": "16.4.6",
     "next-auth": "^5.0.0-beta.32",
+    "next-themes": "^0.4.6",
     "octokit": "^5.0.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "resend": "^6.38.0"
+    "resend": "^6.38.0",
+    "stripe": "^23.1.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",

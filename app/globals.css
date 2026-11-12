@@ -1,14 +1,40 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   color-scheme: light;
+  --paper: #f7f5f0;
+  --surface: #ffffff;
+  --ink: #161614;
+  --muted: #6b6a63;
+  --line: #e4e1d8;
+  --code: #f2efe8;
+  --success: #1f7a3d;
+  --success-soft: #e6f4ea;
+  --danger: #b42318;
+  --danger-soft: #feebeb;
+}
+
+.dark {
+  color-scheme: dark;
+  --paper: #171713;
+  --surface: #1e1e1a;
+  --ink: #edede6;
+  --muted: #a2a29b;
+  --line: #31312b;
+  --code: #26261f;
+  --success: #5ccb83;
+  --success-soft: #1e3326;
+  --danger: #f77e75;
+  --danger-soft: #3a211f;
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: #f7f5f0;
-  color: #161614;
+  background-color: var(--paper);
+  color: var(--ink);
 }
 
 pre::-webkit-scrollbar {
@@ -17,6 +43,6 @@ pre::-webkit-scrollbar {
 }
 
 pre::-webkit-scrollbar-thumb {
-  background: #e4e1d8;
+  background: var(--line);
   border-radius: 3px;
 }

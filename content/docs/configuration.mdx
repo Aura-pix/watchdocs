@@ -1,0 +1,62 @@
+---
+title: Configuration
+description: Watched paths, documentation folders, and pull request settings.
+order: 4
+---
+
+Repository settings live under **Manage** on the dashboard. Everything can be overridden per repository, and every field has a sensible default so you can start without editing anything.
+
+## Watched paths
+
+A list of globs that select the API code Watchdocs pays attention to. A change outside these paths never opens a pull request.
+
+Defaults:
+
+```text
+src/routes/**/*.{ts,js,py,go}
+src/controllers/**/*.{ts,js,py,go}
+openapi.{json,yaml,yml}
+```
+
+Leave the field empty to use these defaults or the `watch` section of a `.watchdocsrc.json` file in the repository.
+
+## Documentation paths
+
+Directories to scan for pages that mention a changed endpoint. Files in `docs.files` are always considered.
+
+Defaults:
+
+```text
+docs
+content
+public
+```
+
+## Default branch
+
+Pushes to this branch are analyzed. Watchdocs ignores pushes to feature branches.
+
+## Branch prefix
+
+The prefix used for the pull request branch, with the short commit SHA appended.
+
+Default: `watchdocs/sync-`
+
+## Pull request labels
+
+Labels applied to opened pull requests. Watchdocs only applies labels that already exist in the repository, so nothing fails if a label is missing.
+
+## Doc mappings
+
+Pin an endpoint or route pattern to a specific documentation file.
+
+| Route pattern | Doc file |
+|---|---|
+| `POST /swap` | `docs/api/swap.mdx` |
+| `/v1/orders/*` | `docs/api/orders.mdx` |
+
+Mapped pages are always included in the edit, in addition to the pages Watchdocs ranks automatically.
+
+## `.watchdocsrc.json`
+
+For repositories that need versioned configuration, Watchdocs reads a `.watchdocsrc.json` file at the repository root. Repository settings in the dashboard take precedence over the file.

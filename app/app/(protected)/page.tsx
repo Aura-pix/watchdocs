@@ -85,6 +85,7 @@ export default async function DashboardPage({
     : null;
   const showInstalled = params.installed === "1";
   const showInvalidRepo = params.error === "invalid-repo";
+  const showPlanLimit = params.error === "plan-limit";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
@@ -123,6 +124,13 @@ export default async function DashboardPage({
       {showInvalidRepo && (
         <div className="mt-6 rounded-lg border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger">
           That repository could not be found.
+        </div>
+      )}
+
+      {showPlanLimit && (
+        <div className="mt-6 rounded-lg border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger">
+          Your plan does not allow another watched repository. Upgrade or pause
+          one first.
         </div>
       )}
 

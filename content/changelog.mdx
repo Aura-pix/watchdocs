@@ -1,0 +1,35 @@
+---
+title: Changelog
+description: What changed in Watchdocs, by release.
+---
+
+## v0.4 — Billing and hardening
+
+- Stripe billing with Free, Pro, and Team plans; overage packs on Pro and Team.
+- Plan limits enforced on repository count and monthly updates. Runs past the limit are skipped with a reason in run history.
+- Billing page shows current plan, usage, and a link to manage the subscription.
+- Runs are idempotent. A webhook delivery that retries reuses the same run instead of creating a duplicate.
+- Usage is recorded exactly once per run, so retries cannot double-count updates.
+- Manual edits on a Watchdocs branch are preserved: if someone changed the branch, a new branch is created instead of force-updating over their work.
+- Pull request labels are only applied when they already exist in the repository.
+- Dark mode, with a toggle in the header that follows your system preference by default.
+
+## v0.3 — Server-side pipeline
+
+- GitHub webhook with HMAC signature verification and delivery-id dedupe.
+- Inngest queue with a `watchdocs-process-push` function.
+- Server-side pipeline: snapshot the repo, filter watched files, semantic gate, doc ranking, fixture harvesting, LLM edits, validation, PR creation.
+- Run history, token usage, cost, and monthly usage recorded for every run.
+- Pull requests opened and updated on `watchdocs/sync-*` branches; run statuses updated when a Watchdocs PR is merged or closed.
+- Repo settings for watched paths, docs paths, default branch, branch prefix, labels, and endpoint-to-doc mappings.
+
+## v0.2 — GitHub App install flow
+
+- Sign in with GitHub via the App's OAuth flow.
+- Install callback verifies you can manage the installation, lists its repositories, and stores them.
+- Dashboard with connected repositories, enable and pause, and the repo picker.
+
+## v0.1 — Landing and engine
+
+- Landing page, waitlist with Postgres persistence and confirmation email.
+- The documentation engine as testable modules with a CLI dry-run.

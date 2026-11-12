@@ -1,5 +1,15 @@
 import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
+import ThemeToggle from "@/components/ThemeToggle";
 import { signOutAction } from "@/lib/app/actions";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function AppLayout({
   children,
@@ -11,9 +21,7 @@ export default function AppLayout({
       <header className="border-b border-line bg-surface">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-ink font-mono text-sm font-bold text-paper">
-              W
-            </span>
+            <Image src="/mark.svg" alt="" width={28} height={28} />
             <span className="text-base font-semibold tracking-tight">
               Watchdocs
             </span>
@@ -33,11 +41,18 @@ export default function AppLayout({
               Runs
             </Link>
             <Link
+              href="/app/billing"
+              className="text-muted transition-colors hover:text-ink"
+            >
+              Billing
+            </Link>
+            <Link
               href="/app/settings"
               className="text-muted transition-colors hover:text-ink"
             >
               Settings
             </Link>
+            <ThemeToggle />
             <form action={signOutAction}>
               <button
                 type="submit"

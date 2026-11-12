@@ -1,0 +1,32 @@
+---
+title: Usage and pricing
+description: Plans, limits, and how updates are counted.
+order: 5
+---
+
+Plans attach to a GitHub installation, not to a person. One opened or updated pull request counts as one update.
+
+## Plans
+
+| Plan | Price | Repositories | Updates per month |
+|---|---|---|---|
+| Free | $0 | 1 | 30 |
+| Pro | $19/mo | 5 | 200 |
+| Team | $49/mo | 20 | 1,000 |
+| Enterprise | Custom | Custom | Custom |
+
+Overage packs are available on Pro and Team at $10 per extra 250 updates. Enterprise adds SSO, bring-your-own LLM key, audit logs, an SLA, and a security review. Contact us for Enterprise pricing.
+
+## How limits are enforced
+
+- **Repository limit.** Runs are skipped for repositories beyond your plan's repository limit. Pause extras from the dashboard.
+- **Update limit.** Once the monthly update count for an installation reaches the plan limit, new runs are skipped with a clear reason in the run history.
+- **Overage.** If you buy an overage pack, the update limit rises by 250 per pack. The billing page shows current usage against the limit.
+
+## What counts as an update
+
+An opened pull request counts as one update. Updating an existing Watchdocs pull request on a later push also counts as one update. Skipped runs, failed runs, and internal refactors that never open a pull request do not count.
+
+## Billing during the beta
+
+Everything is free while the beta is running. Once billing is enabled, existing installations keep whatever plan they are on, and no plan is charged retroactively.

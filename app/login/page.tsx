@@ -1,11 +1,22 @@
 import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { auth } from "@/auth";
 import { isAuthConfigured } from "@/lib/auth/env";
 import { safeCallbackUrl } from "@/lib/auth/callback";
 import SetupNotice from "@/components/app/SetupNotice";
+import ThemeToggle from "@/components/ThemeToggle";
 import { signInWithGitHub } from "./actions";
+
+export const metadata: Metadata = {
+  title: "Sign in — Watchdocs",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function LoginPage({
   searchParams,
@@ -39,15 +50,14 @@ export default async function LoginPage({
   return (
     <div className="flex min-h-screen flex-col bg-paper">
       <header className="border-b border-line px-4">
-        <div className="mx-auto flex h-16 max-w-6xl items-center">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-ink font-mono text-sm font-bold text-paper">
-              W
-            </span>
+            <Image src="/mark.svg" alt="" width={28} height={28} />
             <span className="text-base font-semibold tracking-tight">
               Watchdocs
             </span>
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 

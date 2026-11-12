@@ -1,0 +1,32 @@
+---
+title: Installation
+description: Install the GitHub App and connect a repository.
+order: 3
+---
+
+Watchdocs is a GitHub App. There is no workflow file to add and no webhook to configure yourself.
+
+## Install
+
+1. Sign in to Watchdocs with the GitHub account that can install the App on your repositories or organizations.
+2. Click **Install on GitHub**.
+3. Choose the repositories the App can access.
+4. Return to the dashboard and enable the repositories you want to watch.
+
+Connected repositories start paused. Enable them one at a time so the first run is easy to review.
+
+## Permissions
+
+The App requests exactly three scopes:
+
+- Contents: read and write
+- Pull requests: read and write
+- Metadata: read
+
+It subscribes to four webhook events: `push`, `pull_request`, `installation`, and `installation_repositories`.
+
+## What happens after you enable a repository
+
+The first run triggers on the next push to the default branch. To see the pipeline without waiting, push a change to a watched API file or update the repository settings.
+
+Every run appears in **Runs** with the commit, the endpoint it touched, the files it edited, token usage, cost, and the pull request it opened.

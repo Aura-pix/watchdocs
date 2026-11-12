@@ -6,17 +6,20 @@ Nothing merges on its own.
 
 ## Status
 
-The landing page and waitlist run on Postgres, the documentation engine is split into testable modules with a CLI dry-run, and the GitHub App install flow stores installations and repositories. The webhook queue, server-side push pipeline, repository settings, and run history are wired. Billing is a beta placeholder. Remaining milestones are public documentation polish, Stripe billing, and hardening. See `WATCHDOCS_BUILD_SPEC.md` for the full product shape and `TODO.md` for the engine roadmap.
+The full product path is built: landing and waitlist on Postgres, the documentation engine as testable modules with a CLI dry-run, the GitHub App install flow, the webhook queue and server-side push pipeline, repository settings, run history, a public docs/changelog/privacy/terms site, and Stripe billing with plan enforcement. Dark mode follows the system preference with a header toggle. See `WATCHDOCS_BUILD_SPEC.md` for the product shape, `TODO.md` for the engine roadmap, and `TESTING.md` for the staged test plan from local QA through public beta.
 
 ## Stack
 
 - Next.js 16 (App Router), React 19, TypeScript
-- Tailwind CSS 4
+- Instrument Sans and JetBrains Mono via `next/font`
+- Tailwind CSS 4 with light and dark themes
 - Neon Postgres + Drizzle ORM
 - Auth.js with GitHub, Octokit for the GitHub App
 - Inngest for the webhook queue
 - Gemini via the Generative Language API
 - Resend for waitlist email
+- Stripe for billing
+- MDX for the docs site, next-themes for dark mode
 - Vitest for unit tests
 
 ## Getting started
@@ -63,6 +66,12 @@ Without `DATABASE_URL`, the waitlist route writes to `waitlist.json` in developm
 | `GITHUB_WEBHOOK_SECRET` | App | HMAC secret for `/api/github/webhook` |
 | `INNGEST_EVENT_KEY` | Production | Inngest event key |
 | `INNGEST_SIGNING_KEY` | Production | Inngest signing key |
+| `STRIPE_SECRET_KEY` | Billing | Stripe secret key |
+| `STRIPE_WEBHOOK_SECRET` | Billing | Signing secret for `/api/stripe/webhook` |
+| `NEXT_PUBLIC_APP_URL` | Billing | Public app URL used for Stripe return URLs |
+| `STRIPE_PRICE_PRO` | Billing | Stripe price id for Pro |
+| `STRIPE_PRICE_TEAM` | Billing | Stripe price id for Team |
+| `STRIPE_PRICE_OVERAGE` | Billing | Stripe price id for a 250-update overage pack |
 
 ## GitHub App
 
@@ -118,7 +127,20 @@ The queued push job:
 5. Commits the edited docs and opens or updates a `watchdocs/sync-*` pull request.
 6. Stores the run result, token usage, cost, and monthly usage.
 
-`/app` shows connected repositories, open pull requests, and recent runs. `/app/runs` lists run history and `/app/runs/[id]` shows the endpoint, changed files, documentation before/after, the unified diff, tokens, cost, and errors. `/app/repos/[id]` edits watched paths, documentation paths, default branch, branch prefix, PR labels, and endpoint-to-doc mappings. `/app/settings` shows installations and deletes account data; `/app/billing` is a beta placeholder.
+`/app` shows connected repositories, open pull requests, and recent runs. `/app/runs` lists run history and `/app/runs/[id]` shows the endpoint, changed files, documentation before/after, the unified diff, tokens, cost, and errors. `/app/repos/[id]` edits watched paths, documentation paths, default branch, branch prefix, PR labels, and endpoint-to-doc mappings. `/app/billing` shows plans, usage, and Stripe checkout and portal actions. `/app/settings` shows installations and deletes account data.
+
+Public pages: `/docs` and `/docs/[...slug]` render the content in `content/docs`, and `/changelog`, `/privacy`, `/terms` render the matching MDX files. Dark mode is available from the header on every page.
+
+## Billing
+
+Billing is off until `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `NEXT_PUBLIC_APP_URL` are set. When they are:
+
+1. Create a Pro and a Team recurring price and an overage one-time price in Stripe.
+2. Put the price ids in `STRIPE_PRICE_PRO`, `STRIPE_PRICE_TEAM`, and `STRIPE_PRICE_OVERAGE`.
+3. Add a webhook endpoint at `/api/stripe/webhook` for `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted`.
+4. Put the signing secret in `STRIPE_WEBHOOK_SECRET`.
+
+Plans attach to an installation. The pipeline checks the repository and monthly update limits before every run and records skipped runs when a limit is reached. Usage is recorded once per run, so Inngest retries cannot double-count updates.
 
 ## Documentation engine
 
@@ -168,13 +190,15 @@ npm run engine
 ## Layout
 
 ```
-app/                landing, login, dashboard, runs, repo settings, waitlist/auth/webhook/Inngest routes
-components/         InstallButton, InteractiveDiff, WaitlistForm, setup notice, status badge
+app/                landing, docs, changelog, privacy, terms, app routes, API routes
+components/         UI, theme toggle, MDX renderer, setup notice, status badge
+content/            docs, changelog, privacy, terms (MDX)
 lib/db/             Drizzle schema and Neon client
 lib/engine/         filtering, detection, discovery, fixtures, patching, LLM, PR
 lib/github/         App auth, repo snapshots, webhook verification, PR API
 lib/inngest/        queue client and functions
-lib/pipeline/       server-side push pipeline
+lib/pipeline/       server-side push pipeline, mappings, error classification
+lib/billing/        plans, limits, Stripe client, actions, webhook
 scripts/            CLI entry point
 .github/workflows/  CI and the self-hosted sync action
 ```

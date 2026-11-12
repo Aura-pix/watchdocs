@@ -44,6 +44,11 @@ export const installations = pgTable("installations", {
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
   plan: text("plan").notNull().default("free"),
   status: text("status").notNull().default("active"),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripeSubscriptionStatus: text("stripe_subscription_status"),
+  stripePriceId: text("stripe_price_id"),
+  overagePacks: integer("overage_packs").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -115,8 +120,10 @@ export const runs = pgTable(
       .notNull()
       .default([]),
     diff: text("diff"),
+    webhookDeliveryId: text("webhook_delivery_id"),
     prNumber: integer("pr_number"),
     prUrl: text("pr_url"),
+    usageRecorded: boolean("usage_recorded").notNull().default(false),
     inputTokens: integer("input_tokens").notNull().default(0),
     outputTokens: integer("output_tokens").notNull().default(0),
     costUsd: numeric("cost_usd", { precision: 12, scale: 6 })
@@ -131,6 +138,7 @@ export const runs = pgTable(
   (table) => [
     index("runs_repo_idx").on(table.repoId),
     index("runs_created_idx").on(table.createdAt),
+    uniqueIndex("runs_webhook_delivery_idx").on(table.webhookDeliveryId),
   ],
 );
 

@@ -1,0 +1,46 @@
+---
+title: How Watchdocs works
+description: The five steps between a push and a pull request.
+order: 2
+---
+
+Every run follows the same five steps. No workflow file is added to your repository, and no code ever leaves GitHub's servers while the pipeline runs.
+
+## 1. Watch
+
+A GitHub webhook fires on every push to your default branch. Watchdocs stores the delivery id to deduplicate retries, then enqueues a job.
+
+## 2. Filter
+
+The job compares the pushed commits and keeps only the files you have watched. If nothing matches, the run is recorded as skipped and no model call happens.
+
+The semantic gate then inspects the diff of the remaining files for public interface changes:
+
+- Route path changed
+- HTTP method changed
+- Request schema or types changed
+- Error status codes added or removed
+
+If none of these changed, the run stops. Internal refactors never open a pull request.
+
+## 3. Map
+
+Watchdocs builds a ranked list of the documentation pages that mention the changed endpoint. Direct route matches rank first, error-reference pages rank when the diff adds new failures, and `llms.txt` plus OpenAPI files are always included.
+
+You can pin an endpoint to a specific page from the repository settings. Mapped pages are always included in the edit.
+
+## 4. Edit
+
+The engine reads request, response, and failure payloads from your test files so the examples it writes are grounded in real behavior. It strips frontmatter before sending content to the model and re-attaches it unchanged afterward.
+
+Every edit is checked before it is committed:
+
+- No headings, fences, or code blocks were dropped.
+- Every status code written in the docs exists in the diff, the OpenAPI spec, or a fixture.
+- Frontmatter survived untouched.
+
+## 5. Review
+
+Edits are committed to a `watchdocs/sync-<short-sha>` branch. If an open Watchdocs branch already exists for the repository, it is updated instead. The pull request includes the cause, a changelog of the edits, the files touched, and the original commit author assigned as reviewer.
+
+Nothing merges on its own.

@@ -28,11 +28,19 @@ import type {
   LLMUsage,
   WatchdocsConfig,
 } from "@/lib/engine/types";
-import { createRun, finishRun, recordUsage } from "@/lib/app/runs";
+import {
+  createRun,
+  findRunByDelivery,
+  finishRun,
+  recordUsageOnce,
+  resetRun,
+} from "@/lib/app/runs";
 import { getApp } from "@/lib/github/app";
 import { commitAndOpenPullRequest } from "@/lib/github/pull-requests";
 import { RepoSnapshot } from "@/lib/github/repo-snapshot";
+import { checkInstallationLimits } from "@/lib/billing/limits";
 import { applyRepoOverrides } from "@/lib/pipeline/config";
+import { isTransientError } from "@/lib/pipeline/errors";
 import { mappedDocPaths } from "@/lib/pipeline/mappings";
 import {
   buildUnifiedDiff,
@@ -543,12 +551,63 @@ export async function runPushPipeline(
     return { status: "ignored", reason: "Installation does not match." };
   }
 
-  const runId = await createRun({
-    repoId: row.repo.id,
-    commitSha: input.after,
-  });
+  const deliveryId = input.deliveryId?.trim();
+  let runId: string;
+
+  if (deliveryId) {
+    const existing = await findRunByDelivery(deliveryId);
+
+    if (existing) {
+      if (
+        existing.status === "opened" ||
+        existing.status === "skipped" ||
+        existing.status === "merged" ||
+        existing.status === "closed"
+      ) {
+        return {
+          status: existing.status === "skipped" ? "skipped" : "opened",
+          runId: existing.id,
+          reason:
+            existing.status === "skipped"
+              ? existing.skipReason ?? "Already processed."
+              : undefined,
+          prUrl: existing.prUrl ?? undefined,
+          prNumber: existing.prNumber ?? undefined,
+        };
+      }
+
+      runId = existing.id;
+      await resetRun(runId);
+    } else {
+      runId = await createRun({
+        repoId: row.repo.id,
+        commitSha: input.after,
+        webhookDeliveryId: deliveryId,
+      });
+    }
+  } else {
+    runId = await createRun({
+      repoId: row.repo.id,
+      commitSha: input.after,
+    });
+  }
 
   try {
+    const gate = await checkInstallationLimits(row.installation.id);
+
+    if (!gate.ok) {
+      await finishRun(runId, {
+        status: "skipped",
+        skipReason: gate.reason,
+      });
+
+      return {
+        status: "skipped",
+        runId,
+        reason: gate.reason,
+      };
+    }
+
     const result = await executePipeline(input, row.repo);
 
     if (result.status === "skipped") {
@@ -580,7 +639,8 @@ export async function runPushPipeline(
       diff: result.diff,
     });
 
-    await recordUsage({
+    await recordUsageOnce({
+      runId,
       installationId: row.installation.id,
       prCount: 1,
       costUsd: result.usage?.costUsd ?? 0,
@@ -601,6 +661,10 @@ export async function runPushPipeline(
       status: "failed",
       error: message,
     });
+
+    if (isTransientError(error)) {
+      throw error;
+    }
 
     return {
       status: "failed",

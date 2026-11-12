@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { auth, getAuth } from "@/auth";
 import { getDb, isDbConfigured } from "@/lib/db";
 import { installations, repos } from "@/lib/db/schema";
+import { canEnableRepo } from "@/lib/billing/limits";
 import { ensureUser } from "./users";
 
 const UUID_PATTERN =
@@ -38,7 +39,11 @@ export async function toggleRepoAction(formData: FormData): Promise<void> {
 
   const db = getDb();
   const [owned] = await db
-    .select({ id: repos.id })
+    .select({
+      id: repos.id,
+      installationId: repos.installationId,
+      enabled: repos.enabled,
+    })
     .from(repos)
     .innerJoin(installations, eq(repos.installationId, installations.id))
     .where(and(eq(repos.id, repoId), eq(installations.userId, user.id)))
@@ -48,9 +53,18 @@ export async function toggleRepoAction(formData: FormData): Promise<void> {
     throw new Error("Repository not found.");
   }
 
+  const enabling = formData.get("enabled") === "true";
+
+  if (enabling && !owned.enabled) {
+    const gate = await canEnableRepo(owned.installationId, false);
+    if (!gate.ok) {
+      redirect("/app?error=plan-limit");
+    }
+  }
+
   await db
     .update(repos)
-    .set({ enabled: formData.get("enabled") === "true" })
+    .set({ enabled: enabling })
     .where(eq(repos.id, repoId));
 
   revalidatePath("/app");
