@@ -29,6 +29,13 @@
       "when": 1794470057308,
       "tag": "0003_spotty_barracuda",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794481579733,
+      "tag": "0004_fluffy_hulk",
+      "breakpoints": true
     }
   ]
 }

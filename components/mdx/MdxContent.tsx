@@ -2,6 +2,23 @@ import type * as React from "react";
 import { evaluate } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
 
+const contentClassName = [
+  "[&_table]:w-full",
+  "[&_table]:border-collapse",
+  "[&_table]:text-sm",
+  "[&_th]:border-b",
+  "[&_th]:border-line",
+  "[&_th]:px-3",
+  "[&_th]:py-2",
+  "[&_th]:text-left",
+  "[&_th]:font-semibold",
+  "[&_td]:border-b",
+  "[&_td]:border-line",
+  "[&_td]:px-3",
+  "[&_td]:py-2",
+  "[&_td]:text-ink/80",
+].join(" ");
+
 const components = {
   h1: (props: React.ComponentProps<"h1">) => (
     <h1 className="text-3xl font-semibold tracking-tight" {...props} />
@@ -65,17 +82,17 @@ const components = {
   ),
   table: (props: React.ComponentProps<"table">) => (
     <div className="mt-4 overflow-x-auto">
-      <table className="w-full border-collapse text-sm" {...props} />
+      <table {...props} className="w-full border-collapse text-sm" />
     </div>
   ),
   th: (props: React.ComponentProps<"th">) => (
     <th
-      className="border-b border-line px-3 py-2 text-left font-semibold"
       {...props}
+      className="border-b border-line px-3 py-2 text-left font-semibold"
     />
   ),
   td: (props: React.ComponentProps<"td">) => (
-    <td className="border-b border-line px-3 py-2 text-ink/80" {...props} />
+    <td {...props} className="border-b border-line px-3 py-2 text-ink/80" />
   ),
   strong: (props: React.ComponentProps<"strong">) => (
     <strong className="font-semibold text-ink" {...props} />
@@ -88,5 +105,9 @@ export default async function MdxContent({ source }: { source: string }) {
     useMDXComponents: () => components,
   });
 
-  return <Content />;
+  return (
+    <div className={contentClassName}>
+      <Content />
+    </div>
+  );
 }

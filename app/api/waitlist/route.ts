@@ -24,7 +24,6 @@ function describeApi(payload: WaitlistPayload): string | null {
   const parts = [
     asText(payload.apiType),
     asText(payload.painPoint),
-    asText(payload.repoUrl),
   ].filter(Boolean);
 
   return parts.length > 0 ? parts.join(" | ") : null;
@@ -85,6 +84,7 @@ export async function POST(req: Request) {
   }
 
   const apiDescription = describeApi(payload);
+  const repoUrl = asText(payload.repoUrl) || null;
   const source = asText(payload.source) || "landing";
 
   if (isDbConfigured()) {
@@ -106,6 +106,7 @@ export async function POST(req: Request) {
 
       await db.insert(waitlist).values({
         email,
+        repoUrl,
         apiDescription,
         source,
       });
@@ -132,6 +133,7 @@ export async function POST(req: Request) {
   try {
     await storeInDevFile({
       email,
+      repoUrl,
       apiDescription,
       source,
       createdAt: new Date().toISOString(),

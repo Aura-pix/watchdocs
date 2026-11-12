@@ -17,6 +17,7 @@ export const waitlist = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     email: text("email").notNull(),
+    repoUrl: text("repo_url"),
     apiDescription: text("api_description"),
     source: text("source").notNull().default("landing"),
     createdAt: timestamp("created_at", { withTimezone: true })
