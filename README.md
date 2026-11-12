@@ -6,7 +6,7 @@ Nothing merges on its own.
 
 ## Status
 
-The full product path is built: landing and waitlist on Postgres, the documentation engine as testable modules with a CLI dry-run, the GitHub App install flow, the webhook queue and server-side push pipeline, repository settings, run history, a public docs/changelog/privacy/terms site, and Stripe billing with plan enforcement. Dark mode follows the system preference with a header toggle. See `WATCHDOCS_BUILD_SPEC.md` for the product shape, `TODO.md` for the engine roadmap, and `TESTING.md` for the staged test plan from local QA through public beta.
+The full product path is built: landing and waitlist on Postgres, the documentation engine as testable modules with a CLI dry-run, the GitHub App install flow, the webhook queue and server-side push pipeline, repository settings, run history, a public docs/changelog/privacy/terms site, and Stripe billing with plan enforcement. Dark mode follows the system preference with a header toggle. See `WATCHDOCS_BUILD_SPEC.md` for the product shape and engine behavior, and `TESTING.md` for the staged test plan from local QA through public beta.
 
 ## Stack
 
