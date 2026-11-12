@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
@@ -7,6 +6,7 @@ import { auth } from "@/auth";
 import { isAuthConfigured } from "@/lib/auth/env";
 import { safeCallbackUrl } from "@/lib/auth/callback";
 import SetupNotice from "@/components/app/SetupNotice";
+import BrandMark from "@/components/BrandMark";
 import ThemeToggle from "@/components/ThemeToggle";
 import { signInWithGitHub } from "./actions";
 
@@ -52,7 +52,7 @@ export default async function LoginPage({
       <header className="border-b border-line px-4">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/mark.svg" alt="" width={28} height={28} />
+            <BrandMark />
             <span className="text-base font-semibold tracking-tight">
               Watchdocs
             </span>

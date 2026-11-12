@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { Metadata } from "next";
 import InstallButton from "@/components/InstallButton";
+import BrandMark from "@/components/BrandMark";
 import InteractiveDiff from "@/components/InteractiveDiff";
 import ThemeToggle from "@/components/ThemeToggle";
 import WaitlistForm from "@/components/WaitlistForm";
@@ -149,7 +149,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <a href="#" className="flex items-center gap-2.5">
-            <Image src="/mark.svg" alt="" width={28} height={28} />
+            <BrandMark />
             <span className="text-base font-semibold tracking-tight">
               Watchdocs
             </span>

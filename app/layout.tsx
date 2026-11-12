@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     "API docs sync",
   ],
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    shortcut: ["/favicon.svg"],
+    icon: [{ url: "/favicon-adaptive.svg", type: "image/svg+xml" }],
+    shortcut: ["/favicon-adaptive.svg"],
   },
   openGraph: {
     title: "Watchdocs — Pull requests that keep your docs current",

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="64" height="64">
+  <style>
+    .tile { fill: #161614; }
+    .dog  { fill: #F7F5F0; }
+    .eye  { fill: #161614; }
+    @media (prefers-color-scheme: dark) {
+      .tile { fill: #F7F5F0; }
+      .dog  { fill: #161614; }
+      .eye  { fill: #F7F5F0; }
+    }
+  </style>
+  <rect class="tile" width="128" height="128" rx="28"/>
+  <g transform="translate(-32 0) scale(1.3)">
+    <polygon class="dog" points="40,12 54,34 64,8 74,38 110,56 112,64 100,70 80,76 70,90 40,90 36,44"/>
+    <polygon class="eye" points="80,46 92,48 82,52"/>
+  </g>
+</svg>
