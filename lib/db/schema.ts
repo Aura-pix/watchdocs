@@ -8,6 +8,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -63,12 +64,20 @@ export const repos = pgTable(
       .notNull()
       .default([]),
     docsPaths: jsonb("docs_paths").$type<string[]>().notNull().default([]),
+    branchPrefix: text("branch_prefix").notNull().default("watchdocs/sync-"),
+    prLabels: jsonb("pr_labels").$type<string[]>().notNull().default([]),
     enabled: boolean("enabled").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("repos_installation_idx").on(table.installationId)],
+  (table) => [
+    index("repos_installation_idx").on(table.installationId),
+    uniqueIndex("repos_installation_github_repo_unique").on(
+      table.installationId,
+      table.githubRepoId,
+    ),
+  ],
 );
 
 export const docMappings = pgTable(
@@ -95,6 +104,17 @@ export const runs = pgTable(
     commitSha: text("commit_sha").notNull(),
     status: text("status").notNull().default("running"),
     skipReason: text("skip_reason"),
+    endpoint: jsonb("endpoint").$type<{
+      method: string | null;
+      path: string | null;
+      handler: string | null;
+    }>(),
+    changedFiles: jsonb("changed_files").$type<string[]>().notNull().default([]),
+    docChanges: jsonb("doc_changes")
+      .$type<{ path: string; before: string; after: string }[]>()
+      .notNull()
+      .default([]),
+    diff: text("diff"),
     prNumber: integer("pr_number"),
     prUrl: text("pr_url"),
     inputTokens: integer("input_tokens").notNull().default(0),

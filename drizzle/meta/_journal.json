@@ -8,6 +8,20 @@
       "when": 1794437467552,
       "tag": "0000_pale_maggott",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794438478270,
+      "tag": "0001_hard_firebrand",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794441759866,
+      "tag": "0002_tearful_thunderbolt",
+      "breakpoints": true
     }
   ]
 }

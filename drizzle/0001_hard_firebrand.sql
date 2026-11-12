@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "repos_installation_github_repo_unique" ON "repos" USING btree ("installation_id","github_repo_id");

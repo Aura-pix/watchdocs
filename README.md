@@ -6,13 +6,15 @@ Nothing merges on its own.
 
 ## Status
 
-The landing page and waitlist run on Postgres, and the documentation engine is split into testable modules with a CLI dry-run. The GitHub App, webhook queue, dashboard, and billing are the next milestones. See `WATCHDOCS_BUILD_SPEC.md` for the full product shape and `TODO.md` for the engine roadmap.
+The landing page and waitlist run on Postgres, the documentation engine is split into testable modules with a CLI dry-run, and the GitHub App install flow stores installations and repositories. The webhook queue, server-side push pipeline, repository settings, and run history are wired. Billing is a beta placeholder. Remaining milestones are public documentation polish, Stripe billing, and hardening. See `WATCHDOCS_BUILD_SPEC.md` for the full product shape and `TODO.md` for the engine roadmap.
 
 ## Stack
 
 - Next.js 16 (App Router), React 19, TypeScript
 - Tailwind CSS 4
 - Neon Postgres + Drizzle ORM
+- Auth.js with GitHub, Octokit for the GitHub App
+- Inngest for the webhook queue
 - Gemini via the Generative Language API
 - Resend for waitlist email
 - Vitest for unit tests
@@ -49,11 +51,78 @@ Without `DATABASE_URL`, the waitlist route writes to `waitlist.json` in developm
 | `WATCHDOCS_LLM_MODEL` | No | Model id, defaults to `gemini-2.5-flash` |
 | `RESEND_API_KEY` | No | Sends waitlist confirmation email |
 | `WAITLIST_FROM_EMAIL` | No | Verified Resend sender |
-| `NEXT_PUBLIC_GITHUB_APP_INSTALL_URL` | Later | GitHub App install URL used by the hero button |
+| `AUTH_SECRET` | App | Auth.js session secret |
+| `AUTH_GITHUB_ID` | App | GitHub App client id (OAuth credentials) |
+| `AUTH_GITHUB_SECRET` | App | GitHub App client secret |
+| `GITHUB_APP_ID` | App | Numeric GitHub App id |
+| `GITHUB_APP_PRIVATE_KEY` | App | App private key PEM, newlines escaped as `\n` |
+| `GITHUB_APP_PRIVATE_KEY_BASE64` | App | Base64 PEM (preferred for hosting) |
+| `GITHUB_APP_SLUG` | App | App slug, used to build the install URL |
+| `GITHUB_APP_INSTALL_URL` | No | Overrides the install URL |
+| `NEXT_PUBLIC_GITHUB_APP_INSTALL_URL` | No | Public install URL used by the landing page |
+| `GITHUB_WEBHOOK_SECRET` | App | HMAC secret for `/api/github/webhook` |
+| `INNGEST_EVENT_KEY` | Production | Inngest event key |
+| `INNGEST_SIGNING_KEY` | Production | Inngest signing key |
+
+## GitHub App
+
+Register the App first. These are the settings the code expects:
+
+- Homepage: `http://localhost:3000` locally, your domain in production
+- Callback URL: `http://localhost:3000/api/auth/callback/github`
+- Setup URL: `http://localhost:3000/app/install/callback`
+- Webhook URL: `http://localhost:3000/api/github/webhook`
+- Permissions: Contents read/write, Pull requests read/write, Metadata read
+- Events: `push`, `pull_request`, `installation`, `installation_repositories`
+
+Then:
+
+1. Copy the App id, client id, and client secret into `.env.local`.
+2. Generate a private key and base64-encode it.
+3. Set `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET`, `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY_BASE64`, and `GITHUB_APP_SLUG`.
+4. Generate `AUTH_SECRET` with `npx auth secret` or `openssl rand -base64 32`.
+5. Set a webhook secret and put the same value in `GITHUB_WEBHOOK_SECRET`.
+6. Run `npm run db:push`.
+
+Base64-encode the key:
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("key.pem"))
+```
+
+```bash
+base64 -w0 key.pem
+```
+
+Flow: `/login` signs in with GitHub, the install button opens the App installation screen, GitHub redirects to `/app/install/callback`, the server verifies the signed-in user can manage that installation, lists its repositories, stores them, and sends you to `/app`. Connected repositories start paused and can be enabled from the dashboard.
+
+## Webhook queue
+
+`POST /api/github/webhook` verifies the `X-Hub-Signature-256` HMAC, stores the delivery id for dedupe, then enqueues an Inngest event. Push events are ignored when the sender is a bot, the branch is `watchdocs/*`, or the push is not to the connected default branch.
+
+Run Inngest locally next to the app:
+
+```bash
+npm run dev:inngest
+npm run dev
+```
+
+GitHub needs a public URL reachable from the internet for webhooks. In development, use a tunnel and point the App webhook URL at it. In production, configure the Inngest app with `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY`; the handler is `/api/inngest`.
+
+The queued push job:
+
+1. Loads the repository tree through the GitHub App token.
+2. Compares the pushed commits, filters watched API files, and runs the semantic gate.
+3. Ranks docs, reads test fixtures, and asks the LLM for surgical edits.
+4. Validates frontmatter, headings, fences, and grounded 4xx/5xx status codes.
+5. Commits the edited docs and opens or updates a `watchdocs/sync-*` pull request.
+6. Stores the run result, token usage, cost, and monthly usage.
+
+`/app` shows connected repositories, open pull requests, and recent runs. `/app/runs` lists run history and `/app/runs/[id]` shows the endpoint, changed files, documentation before/after, the unified diff, tokens, cost, and errors. `/app/repos/[id]` edits watched paths, documentation paths, default branch, branch prefix, PR labels, and endpoint-to-doc mappings. `/app/settings` shows installations and deletes account data; `/app/billing` is a beta placeholder.
 
 ## Documentation engine
 
-The engine lives in `lib/engine` and runs in two places: the CLI (`scripts/watchdocs-engine.ts`) and, later, the GitHub App pipeline. The CLI stays as a local dry-run tool.
+The engine lives in `lib/engine` and runs in two places: the CLI (`scripts/watchdocs-engine.ts`) and the GitHub App pipeline. The CLI stays as a local dry-run tool.
 
 Pipeline:
 
@@ -85,6 +154,7 @@ npm run engine
 | Command | Description |
 |---|---|
 | `npm run dev` | Start the Next.js dev server |
+| `npm run dev:inngest` | Start the local Inngest dev server |
 | `npm run build` | Production build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript without emit |
@@ -98,10 +168,13 @@ npm run engine
 ## Layout
 
 ```
-app/                landing page, layout, waitlist route
-components/         InstallButton, InteractiveDiff, WaitlistForm
+app/                landing, login, dashboard, runs, repo settings, waitlist/auth/webhook/Inngest routes
+components/         InstallButton, InteractiveDiff, WaitlistForm, setup notice, status badge
 lib/db/             Drizzle schema and Neon client
 lib/engine/         filtering, detection, discovery, fixtures, patching, LLM, PR
+lib/github/         App auth, repo snapshots, webhook verification, PR API
+lib/inngest/        queue client and functions
+lib/pipeline/       server-side push pipeline
 scripts/            CLI entry point
 .github/workflows/  CI and the self-hosted sync action
 ```

@@ -1,3 +1,5 @@
+import type { WatchdocsConfig } from "./types";
+
 function expandBraces(pattern: string): string[] {
   const start = pattern.indexOf("{");
   if (start === -1) return [pattern];
@@ -69,4 +71,14 @@ export function matchesGlob(file: string, glob: string): boolean {
 export function matchesAny(file: string, globs: string[] | undefined): boolean {
   if (!globs || globs.length === 0) return false;
   return globs.some((glob) => matchesGlob(file, glob));
+}
+
+export function filterWatchedFiles(
+  changedFiles: string[],
+  config: WatchdocsConfig,
+): string[] {
+  return changedFiles
+    .map((file) => file.replace(/\\/g, "/"))
+    .filter((file) => !matchesAny(file, config.watch.ignore))
+    .filter((file) => matchesAny(file, config.watch.routes));
 }

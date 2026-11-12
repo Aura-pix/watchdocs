@@ -1,10 +1,11 @@
+import { getInstallUrl } from "@/lib/github/config";
+
 export default function InstallButton({
   className = "",
 }: {
   className?: string;
 }) {
-  const installUrl =
-    process.env.NEXT_PUBLIC_GITHUB_APP_INSTALL_URL ?? "#waitlist";
+  const installUrl = getInstallUrl() ?? "#waitlist";
 
   return (
     <a

@@ -1,0 +1,56 @@
+import Link from "next/link";
+import { signOutAction } from "@/lib/app/actions";
+
+export default function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-screen flex-col bg-paper">
+      <header className="border-b border-line bg-surface">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-ink font-mono text-sm font-bold text-paper">
+              W
+            </span>
+            <span className="text-base font-semibold tracking-tight">
+              Watchdocs
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-5 text-sm">
+            <Link
+              href="/app"
+              className="text-muted transition-colors hover:text-ink"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/app/runs"
+              className="text-muted transition-colors hover:text-ink"
+            >
+              Runs
+            </Link>
+            <Link
+              href="/app/settings"
+              className="text-muted transition-colors hover:text-ink"
+            >
+              Settings
+            </Link>
+            <form action={signOutAction}>
+              <button
+                type="submit"
+                className="text-muted transition-colors hover:text-ink"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1">{children}</main>
+    </div>
+  );
+}

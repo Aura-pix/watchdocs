@@ -25,15 +25,16 @@ import {
   buildPrTitle,
   guessGithubLogin,
 } from "./pr";
-import { matchesAny } from "./glob";
+import { filterWatchedFiles } from "./glob";
 import type {
   CommitInfo,
   DocCandidate,
   DocChangeSummary,
   LLMUsage,
   RunResult,
-  WatchdocsConfig,
 } from "./types";
+
+export { filterWatchedFiles } from "./glob";
 
 const EMPTY_USAGE: LLMUsage = {
   model: "",
@@ -47,16 +48,6 @@ export interface RunOptions {
   dryRun?: boolean;
   apiKey?: string;
   model?: string;
-}
-
-export function filterWatchedFiles(
-  changedFiles: string[],
-  config: WatchdocsConfig,
-): string[] {
-  return changedFiles
-    .map((file) => file.replace(/\\/g, "/"))
-    .filter((file) => !matchesAny(file, config.watch.ignore))
-    .filter((file) => matchesAny(file, config.watch.routes));
 }
 
 function skipped(

@@ -13,6 +13,7 @@ export {
   validateDocEdit,
   extractHeadings,
 } from "./frontmatter";
+export { addedLines, validateGroundedStatuses } from "./validation";
 export { applyDocEdit, applyReplacements } from "./patch";
 export {
   generateDocEdits,
